@@ -20,4 +20,11 @@ export default defineConfig({
     esbuild: {
         jsx: 'automatic',
     },
+    build: {
+        manifest: true,
+        outDir: 'public/build',
+    },
+    server: {
+        host: '0.0.0.0',
+    },
 });
