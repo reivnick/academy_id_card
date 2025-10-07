@@ -21,8 +21,11 @@ export default defineConfig({
         jsx: 'automatic',
     },
     build: {
-        manifest: true,
         outDir: 'public/build',
+        manifest: true,
+        rollupOptions: {
+            input: ['resources/css/app.css', 'resources/js/app.js'],
+        },
     },
     server: {
         host: '0.0.0.0',
