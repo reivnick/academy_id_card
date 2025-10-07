@@ -9,6 +9,7 @@ export default defineConfig({
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.tsx', 'resources/js/app.jsx'],
             ssr: 'resources/js/ssr.tsx',
+            buildDirectory: 'build',
             refresh: true,
         }),
         react(),
@@ -21,11 +22,9 @@ export default defineConfig({
         jsx: 'automatic',
     },
     build: {
-        outDir: 'public/build',
         manifest: true,
-        rollupOptions: {
-            input: ['resources/css/app.css', 'resources/js/app.js'],
-        },
+        outDir: 'public/build',
+        emptyOutDir: true,
     },
     server: {
         host: '0.0.0.0',
