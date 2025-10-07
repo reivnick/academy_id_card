@@ -8,7 +8,7 @@
     ]
   },
   "resources/js/app.tsx": {
-    "file": "assets/app-WBoK3EXd.js",
+    "file": "assets/app-BdaXgsd0.js",
     "name": "app",
     "src": "resources/js/app.tsx",
     "isEntry": true,
@@ -21,7 +21,7 @@
     ]
   },
   "resources/js/pages/IdCardGenerator.tsx": {
-    "file": "assets/IdCardGenerator-DYNPslee.js",
+    "file": "assets/IdCardGenerator-DsdrL39c.js",
     "name": "IdCardGenerator",
     "src": "resources/js/pages/IdCardGenerator.tsx",
     "isDynamicEntry": true,
@@ -33,7 +33,7 @@
     ]
   },
   "resources/js/pages/welcome.tsx": {
-    "file": "assets/welcome-6kTi6wmA.js",
+    "file": "assets/welcome-s8FoNL_q.js",
     "name": "welcome",
     "src": "resources/js/pages/welcome.tsx",
     "isDynamicEntry": true,
