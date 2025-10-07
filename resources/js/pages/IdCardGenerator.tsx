@@ -1,11 +1,10 @@
-import React, { useRef, useState } from "react";
-import html2canvas from "html2canvas";
-import { jsPDF } from "jspdf";
+import React, { useState } from "react";
+import { Page, Text, Image, Document, StyleSheet, pdf, View } from "@react-pdf/renderer";
+import { saveAs } from "file-saver";
 
 export default function IdCardGenerator() {
     const [name, setName] = useState<string>("");
     const [photoDataUrl, setPhotoDataUrl] = useState<string | null>(null);
-    const cardRef = useRef<HTMLDivElement>(null);
 
     const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -16,27 +15,31 @@ export default function IdCardGenerator() {
     };
 
     const handleDownloadPdf = async () => {
-        if (!cardRef.current) return;
+        if (!photoDataUrl) {
+            alert("Silakan pilih foto terlebih dahulu!");
+            return;
+        }
 
-        const canvas = await html2canvas(cardRef.current, {
-            scale: 5, // tingkatkan resolusi
-            useCORS: true,
-            backgroundColor: null,
-        });
+        const blob = await pdf(
+            <Document>
+                <Page size={[524, 810]} style={styles.page}>
+                    {/* Background template */}
+                    <Image src="/idcard_template.png" style={styles.background} />
 
-        const imgData = canvas.toDataURL("image/png");
+                    {/* Foto */}
+                    {photoDataUrl && (
+                        <View style={styles.photoWrapper}>
+                            <Image src={photoDataUrl} style={styles.photo} />
+                        </View>
+                    )}
 
-        const pdf = new jsPDF({
-            orientation: "portrait",
-            unit: "px",
-            format: [810, 524],
-        });
+                    {/* Nama */}
+                    <Text style={styles.name}>{name || "Nama Lengkap"}</Text>
+                </Page>
+            </Document>
+        ).toBlob();
 
-        const imgWidth = pdf.internal.pageSize.getWidth();
-        const imgHeight = pdf.internal.pageSize.getHeight();
-
-        pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight, undefined, "SLOW");
-        pdf.save(`${name || "idcard"}.pdf`);
+        saveAs(blob, `${name || "idcard"}.pdf`);
     };
 
     return (
@@ -71,7 +74,14 @@ export default function IdCardGenerator() {
                         justifyContent: "center",
                     }}
                 >
-                    <h2 style={{ color: "#333", fontWeight: 700, fontSize: "22px", marginBottom: "24px" }}>
+                    <h2
+                        style={{
+                            color: "#333",
+                            fontWeight: 700,
+                            fontSize: "22px",
+                            marginBottom: "24px",
+                        }}
+                    >
                         Buat ID Card
                     </h2>
 
@@ -96,7 +106,7 @@ export default function IdCardGenerator() {
                         style={{
                             padding: "10px 12px",
                             borderRadius: 6,
-                            border: "1px solid #ddd",
+                            border: "1px solid #ccc",
                             marginBottom: 20,
                         }}
                     />
@@ -104,7 +114,7 @@ export default function IdCardGenerator() {
                     <button
                         onClick={handleDownloadPdf}
                         style={{
-                            background: "linear-gradient(135deg, #ff6b4a, #ff3f7a)",
+                            background: "linear-gradient(135deg, #003A69, #0469BA)",
                             color: "#fff",
                             border: "none",
                             padding: "12px 20px",
@@ -118,11 +128,11 @@ export default function IdCardGenerator() {
                     </button>
                 </div>
 
-                {/* RIGHT SIDE - PREVIEW */}
+                {/* RIGHT SIDE - LIVE PREVIEW */}
                 <div
                     style={{
                         flex: 1,
-                        background: "linear-gradient(135deg,#ff416c,#ff4b2b)",
+                        background: "linear-gradient(135deg, #003A69, #0469BA)",
                         color: "#fff",
                         display: "flex",
                         flexDirection: "column",
@@ -132,59 +142,92 @@ export default function IdCardGenerator() {
                     }}
                 >
                     <div
-                        ref={cardRef}
                         style={{
-                            width: 524,
-                            height: 810,
-                            transform: "scale(0.65)",
+                            width: 262,
+                            height: 405,
+                            position: "relative",
                             backgroundImage: "url('/idcard_template.png')",
                             backgroundSize: "cover",
                             backgroundPosition: "center",
-                            position: "absolute",
                             boxShadow: "0 8px 30px rgba(0,0,0,0.15)",
+                            borderRadius: 12,
                         }}
                     >
-                        {/* FOTO */}
                         {photoDataUrl && (
                             <img
                                 src={photoDataUrl}
-                                alt="foto"
+                                alt="preview"
                                 style={{
                                     position: "absolute",
-                                    top: 200,
+                                    top: "40%",
                                     left: "50%",
-                                    transform: "translateX(-50%)",
-                                    width: 350,
-                                    height: 350,
-                                    borderRadius: "50%",
+                                    transform: "translate(-50%, -30%)",
+                                    width: 150,
+                                    height: 150,
+                                    borderRadius: "55%",
                                     objectFit: "cover",
-                                    aspectRatio: 1,
                                     border: "3px solid #fff",
                                     boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
                                 }}
                             />
                         )}
 
-                        {/* NAMA */}
                         <div
                             style={{
                                 position: "absolute",
-                                bottom: 55,
+                                bottom: 25,
                                 left: 0,
                                 width: "100%",
                                 textAlign: "center",
-                                fontSize: 20,
+                                fontSize: 14,
                                 fontWeight: 700,
                                 color: "#222",
                             }}
                         >
                             {name || "Nama Lengkap"}
                         </div>
-
                     </div>
                 </div>
             </div>
         </div>
-
     );
 }
+
+// PDF STYLES
+const styles = StyleSheet.create({
+    page: {
+        position: "relative",
+        backgroundColor: "#fff",
+    },
+    background: {
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+    },
+    photoWrapper: {
+        position: "absolute",
+        top: "20%",
+        left: "17%",
+        width: 350,
+        height: 350,
+        borderRadius: 200,
+        overflow: "hidden",
+        border: "3px solid #fff",
+    },
+    photo: {
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
+        borderRadius: 200,
+    },
+    name: {
+        position: "absolute",
+        bottom: 55,
+        left: 0,
+        width: "100%",
+        textAlign: "center",
+        fontSize: 22,
+        fontWeight: "bold",
+        color: "#222",
+    },
+});
