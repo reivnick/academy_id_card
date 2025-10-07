@@ -1,10 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Page, Text, Image, Document, StyleSheet, pdf, View } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
 
 export default function IdCardGenerator() {
     const [name, setName] = useState<string>("");
     const [photoDataUrl, setPhotoDataUrl] = useState<string | null>(null);
+    const [isMobile, setIsMobile] = useState<boolean>(false);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -48,16 +60,19 @@ export default function IdCardGenerator() {
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                height: "100vh",
+                minHeight: "100vh",
                 background: "#f4f6fa",
                 fontFamily: "Inter, sans-serif",
+                padding: "20px",
             }}
         >
             <div
                 style={{
                     display: "flex",
-                    width: "900px",
-                    height: "700px",
+                    flexDirection: isMobile ? "column" : "row",
+                    width: "100%",
+                    maxWidth: "900px",
+                    minHeight: isMobile ? "auto" : "600px",
                     borderRadius: "16px",
                     overflow: "hidden",
                     boxShadow: "0 8px 30px rgba(0,0,0,0.15)",
@@ -68,10 +83,11 @@ export default function IdCardGenerator() {
                     style={{
                         flex: 1,
                         background: "#ffffff",
-                        padding: "40px",
+                        padding: isMobile ? "20px" : "40px",
                         display: "flex",
                         flexDirection: "column",
                         justifyContent: "center",
+                        minHeight: isMobile ? "auto" : "300px",
                     }}
                 >
                     <h2
@@ -92,9 +108,11 @@ export default function IdCardGenerator() {
                         onChange={handlePhotoChange}
                         style={{
                             marginBottom: 16,
-                            padding: 8,
+                            padding: isMobile ? 12 : 8,
                             borderRadius: 6,
                             border: "1px solid #ccc",
+                            fontSize: isMobile ? "16px" : "14px",
+                            minHeight: isMobile ? "44px" : "auto",
                         }}
                     />
 
@@ -104,10 +122,12 @@ export default function IdCardGenerator() {
                         onChange={(e) => setName(e.target.value)}
                         placeholder="Masukkan nama lengkap"
                         style={{
-                            padding: "10px 12px",
+                            padding: isMobile ? "14px 16px" : "10px 12px",
                             borderRadius: 6,
                             border: "1px solid #ccc",
                             marginBottom: 20,
+                            fontSize: isMobile ? "16px" : "14px",
+                            minHeight: isMobile ? "44px" : "auto",
                         }}
                     />
 
@@ -117,11 +137,14 @@ export default function IdCardGenerator() {
                             background: "linear-gradient(135deg, #003A69, #0469BA)",
                             color: "#fff",
                             border: "none",
-                            padding: "12px 20px",
+                            padding: isMobile ? "16px 24px" : "12px 20px",
                             borderRadius: "8px",
                             cursor: "pointer",
                             fontWeight: 600,
                             letterSpacing: 0.5,
+                            fontSize: isMobile ? "16px" : "14px",
+                            minHeight: isMobile ? "48px" : "auto",
+                            width: "100%",
                         }}
                     >
                         Unduh ID Card (PDF)
@@ -138,13 +161,27 @@ export default function IdCardGenerator() {
                         flexDirection: "column",
                         justifyContent: "center",
                         alignItems: "center",
-                        padding: "30px",
+                        padding: isMobile ? "20px" : "30px",
+                        minHeight: isMobile ? "400px" : "300px",
                     }}
                 >
+                    <h2
+                        style={{
+                            color: "#fff",
+                            fontWeight: 700,
+                            fontSize: "22px",
+                            marginBottom: "24px",
+                        }}
+                    >
+                        ID Card Preview
+                    </h2>
+
                     <div
                         style={{
-                            width: 262,
-                            height: 405,
+                            width: isMobile ? "100%" : 262,
+                            maxWidth: isMobile ? 300 : 262,
+                            height: isMobile ? "auto" : 405,
+                            aspectRatio: isMobile ? "3/4" : "auto",
                             position: "relative",
                             backgroundImage: "url('/idcard_template.png')",
                             backgroundSize: "cover",
@@ -153,7 +190,7 @@ export default function IdCardGenerator() {
                             borderRadius: 12,
                         }}
                     >
-                        {photoDataUrl && (
+                        {photoDataUrl ? (
                             <img
                                 src={photoDataUrl}
                                 alt="preview"
@@ -170,6 +207,33 @@ export default function IdCardGenerator() {
                                     boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
                                 }}
                             />
+                        ) : (
+                            <div
+                                style={{
+                                    position: "absolute",
+                                    top: "40%",
+                                    left: "50%",
+                                    transform: "translate(-50%, -30%)",
+                                    width: 150,
+                                    height: 150,
+                                    borderRadius: "55%",
+                                    border: "3px dashed #ccc",
+                                    backgroundColor: "#f8f9fa",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    color: "#888",
+                                    fontSize: "12px",
+                                    fontWeight: 500,
+                                    textAlign: "center",
+                                }}
+                            >
+                                <div>
+                                    <div style={{ fontSize: "24px", marginBottom: "4px" }}>📷</div>
+                                    <div>Photo</div>
+                                    <div>Placeholder</div>
+                                </div>
+                            </div>
                         )}
 
                         <div
