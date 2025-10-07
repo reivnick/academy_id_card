@@ -9,7 +9,6 @@ export default defineConfig({
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.tsx', 'resources/js/app.jsx'],
             ssr: 'resources/js/ssr.tsx',
-            buildDirectory: 'build',
             refresh: true,
         }),
         react(),
@@ -22,9 +21,8 @@ export default defineConfig({
         jsx: 'automatic',
     },
     build: {
-        manifest: true,
+        manifest: "manifest.json", // Previously manifest: true, default folder .vite
         outDir: 'public/build',
-        emptyOutDir: true,
     },
     server: {
         host: '0.0.0.0',
